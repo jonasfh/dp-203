@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9b418dd6-6354-4e1b-8bbe-08009c37fd56"
+				"spark.autotune.trackingId": "9b8bb631-5ebf-409a-951f-1c48e9a36d10"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 				"source": [
 					"adls_account_name = 'asadatalake783871'"
 				],
-				"execution_count": 2
+				"execution_count": 3
 			},
 			{
 				"cell_type": "markdown",
@@ -85,7 +85,7 @@
 					"# and `inferSchema` instruct Spark to use data within the file to infer data types.\r\n",
 					"df = spark.read.load(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170501.csv', format='csv', header=True, inferSchema=True)"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -121,12 +121,13 @@
 							"filter": null
 						},
 						"isSql": false
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"display(df.limit(10))"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "markdown",
@@ -142,7 +143,7 @@
 					"# Now, print the inferred schema. We will need this information below to help with the missing headers in the May 2, 2017 file.\r\n",
 					"df.printSchema()"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -176,7 +177,8 @@
 							"filter": null
 						},
 						"isSql": false
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"# Create a new data frame containing a list of distinct CustomerId and ProductId values in descending order of the CustomerId.\r\n",
@@ -185,7 +187,7 @@
 					"# Display the first 100 rows of the resulting data frame.\r\n",
 					"display(df_distinct_products.limit(100))"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -200,7 +202,7 @@
 					"df = spark.read.load(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502.csv', format='csv')\r\n",
 					"display(df.limit(10))"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -232,7 +234,7 @@
 					"# Read the CSV file into a resilient distributed dataset (RDD) as a text file. This will read each row of the file into rows in an RDD.\r\n",
 					"rdd = sc.textFile(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502.csv')"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "markdown",
@@ -250,7 +252,7 @@
 					"# Print out the count of fields read into the array.\r\n",
 					"print(field_count)"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "markdown",
@@ -267,6 +269,24 @@
 					"\r\n",
 					"expected_row_count = math.floor(field_count / 11)\r\n",
 					"print(f'The expected row count is: {expected_row_count}')"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
 				],
 				"execution_count": null
 			},
