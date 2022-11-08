@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9b8bb631-5ebf-409a-951f-1c48e9a36d10"
+				"spark.autotune.trackingId": "fa4a0cdc-013a-4081-81c5-e13752f7a64f"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 				"source": [
 					"adls_account_name = 'asadatalake783871'"
 				],
-				"execution_count": 3
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -85,7 +85,7 @@
 					"# and `inferSchema` instruct Spark to use data within the file to infer data types.\r\n",
 					"df = spark.read.load(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170501.csv', format='csv', header=True, inferSchema=True)"
 				],
-				"execution_count": 4
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -127,7 +127,7 @@
 				"source": [
 					"display(df.limit(10))"
 				],
-				"execution_count": 5
+				"execution_count": 3
 			},
 			{
 				"cell_type": "markdown",
@@ -143,7 +143,7 @@
 					"# Now, print the inferred schema. We will need this information below to help with the missing headers in the May 2, 2017 file.\r\n",
 					"df.printSchema()"
 				],
-				"execution_count": 6
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -187,7 +187,7 @@
 					"# Display the first 100 rows of the resulting data frame.\r\n",
 					"display(df_distinct_products.limit(100))"
 				],
-				"execution_count": 7
+				"execution_count": 5
 			},
 			{
 				"cell_type": "markdown",
@@ -202,7 +202,7 @@
 					"df = spark.read.load(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502.csv', format='csv')\r\n",
 					"display(df.limit(10))"
 				],
-				"execution_count": 8
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -234,7 +234,7 @@
 					"# Read the CSV file into a resilient distributed dataset (RDD) as a text file. This will read each row of the file into rows in an RDD.\r\n",
 					"rdd = sc.textFile(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502.csv')"
 				],
-				"execution_count": 9
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -252,7 +252,7 @@
 					"# Print out the count of fields read into the array.\r\n",
 					"print(field_count)"
 				],
-				"execution_count": 10
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -270,7 +270,7 @@
 					"expected_row_count = math.floor(field_count / 11)\r\n",
 					"print(f'The expected row count is: {expected_row_count}')"
 				],
-				"execution_count": 11
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -305,20 +305,73 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"# Create an array to store the data associated with each \"row\". Set the max_index to the number of columns that are in each row. This is 11, which we noted above when viewing the schema of the May 1 file.\r\n",
+					"# Create an array to store the data associated with each \"row\". Set the max_index \r\n",
+					"# to the number of columns that are in each row. This is 11, which we noted above \r\n",
+					"# when viewing the schema of the May 1 file.\r\n",
 					"row_list = []\r\n",
 					"max_index = 11\r\n",
 					"\r\n",
-					"# Now, we are going to loop through the array of values extracted from the single row of the file and build rows consisting of 11 columns.\r\n",
+					"# Now, we are going to loop through the array of values extracted from the single \r\n",
+					"# row of the file and build rows consisting of 11 columns.\r\n",
 					"while max_index <= len(data):\r\n",
 					"    row = [data[i] for i in np.arange(max_index-11, max_index)]\r\n",
 					"    row_list.append(row)\r\n",
-					"\r\n",
 					"    max_index += 11\r\n",
 					"\r\n",
-					"print(f'The row array contains {len(row_list)} rows. The expected number of rows was {expected_row_count}.')"
+					"print(\r\n",
+					"    f'The row array contains {len(row_list)} rows. The expected number' \r\n",
+					"    f' of rows was {expected_row_count}.'\r\n",
+					")"
 				],
-				"execution_count": null
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"row = []\r\n",
+					"row_list = []\r\n",
+					"\r\n",
+					"for i, d in enumerate(data):\r\n",
+					"    row.append(d)\r\n",
+					"    if i % 11 == 10:\r\n",
+					"        row_list.append(row)\r\n",
+					"        row = []\r\n",
+					"print(\r\n",
+					"    f'The row array contains {len(row_list)} rows. The expected number ' \r\n",
+					"    f'of rows was {expected_row_count}.'\r\n",
+					")"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(\"row_list[0]\", row_list[0])\r\n",
+					"print(\"row_list[-1]\", row_list[-1])"
+				],
+				"execution_count": 15
 			},
 			{
 				"cell_type": "markdown",
@@ -352,14 +405,20 @@
 							"filter": null
 						},
 						"isSql": false
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
-					"# Finally, we can use the row_list we created above to create a DataFrame. We can add to this a schema parameter, which contains the column names we saw in the schema of the first file.\r\n",
-					"df_fixed = spark.createDataFrame(row_list,schema=['TransactionId', 'CustomerId', 'ProductId', 'Quantity', 'Price', 'TotalAmount', 'TransactionDateId', 'ProfitAmount', 'Hour', 'Minute', 'StoreId'])\r\n",
+					"# Finally, we can use the row_list we created above to create a DataFrame. We can \r\n",
+					"# add to this a schema parameter, which contains the column names we saw in the \r\n",
+					"# schema of the first file.\r\n",
+					"df_fixed = spark.createDataFrame(row_list,schema=[\r\n",
+					"    'TransactionId', 'CustomerId', 'ProductId', 'Quantity', 'Price', 'TotalAmount',\r\n",
+					"    'TransactionDateId', 'ProfitAmount', 'Hour', 'Minute', 'StoreId'\r\n",
+					"])\r\n",
 					"display(df_fixed.limit(10))"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "markdown",
@@ -377,9 +436,12 @@
 			{
 				"cell_type": "code",
 				"source": [
-					"df_fixed.write.format('csv').option('header',True).mode('overwrite').option('sep',',').save(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502-fixed')"
+					"df_fixed.write.format('csv').option('header',True).mode('overwrite') \\\r\n",
+					"    .option('sep',',').save(\r\n",
+					"        f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502-fixed'\r\n",
+					"    )"
 				],
-				"execution_count": null
+				"execution_count": 17
 			},
 			{
 				"cell_type": "markdown",
