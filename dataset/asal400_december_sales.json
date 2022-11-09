@@ -16,6 +16,57 @@
 			},
 			"compressionCodec": "snappy"
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "TransactionId",
+				"type": "UTF8"
+			},
+			{
+				"name": "CustomerId",
+				"type": "INT32"
+			},
+			{
+				"name": "ProductId",
+				"type": "INT_16"
+			},
+			{
+				"name": "Quantity",
+				"type": "INT_8"
+			},
+			{
+				"name": "Price",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "TotalAmount",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "TransactionDate",
+				"type": "INT32"
+			},
+			{
+				"name": "ProfitAmount",
+				"type": "DECIMAL",
+				"precision": 38,
+				"scale": 18
+			},
+			{
+				"name": "Hour",
+				"type": "INT_8"
+			},
+			{
+				"name": "Minute",
+				"type": "INT_8"
+			},
+			{
+				"name": "StoreId",
+				"type": "INT_16"
+			}
+		]
 	}
 }
