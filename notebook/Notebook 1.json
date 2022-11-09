@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bf90c100-b3b2-4818-85b9-d82be397c7c1"
+				"spark.autotune.trackingId": "ed392959-053d-42ca-90fb-99ea082fdf5a"
 			}
 		},
 		"metadata": {
@@ -198,7 +198,7 @@
 					"flat=df.select('visitorId',explode('topProductPurchases').alias('topProductPurchases_flat'))\r\n",
 					"flat.show(100)"
 				],
-				"execution_count": 9
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -219,7 +219,7 @@
 					"\r\n",
 					"topPurchases.show(100)"
 				],
-				"execution_count": 10
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -241,7 +241,7 @@
 					"\r\n",
 					"display(sortedTopPurchases.limit(100))"
 				],
-				"execution_count": 11
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -263,7 +263,7 @@
 					"\r\n",
 					"display(sortedTopPurchases.limit(100))"
 				],
-				"execution_count": 13
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -287,7 +287,7 @@
 					"\r\n",
 					"display(groupedTopPurchases.limit(100))"
 				],
-				"execution_count": 14
+				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -311,7 +311,147 @@
 					"\r\n",
 					"display(groupedTopPurchases.limit(100))"
 				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Create a temporary view for top purchases so we can load from Scala\r\n",
+					"topPurchases.createOrReplaceTempView(\"top_purchases\")"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "scala"
+					}
+				},
+				"source": [
+					"%%spark\r\n",
+					"// Make sure the name of the dedcated SQL pool (SQLPool01 below) matches the name of your SQL pool.\r\n",
+					"val df = spark.sqlContext.sql(\"select * from top_purchases\")\r\n",
+					"df.write.synapsesql(\"SQLPool01.wwi.TopPurchases\", Constants.INTERNAL)"
+				],
 				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"dfsales = spark.read.load('abfss://wwi-02@' + datalake + '.dfs.core.windows.net/sale-small/Year=2019/Quarter=Q4/Month=12/*/*.parquet', format='parquet')\r\n",
+					"display(dfsales.limit(10))"
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "scala"
+					}
+				},
+				"source": [
+					"%%spark\r\n",
+					"// Make sure the name of the SQL pool (SQLPool01 below) matches the name of your SQL pool.\r\n",
+					"val df2 = spark.read.synapsesql(\"SQLPool01.wwi.TopPurchases\")\r\n",
+					"df2.createTempView(\"top_purchases_sql\")\r\n",
+					"\r\n",
+					"df2.head(10)"
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"dfTopPurchasesFromSql = sqlContext.table(\"top_purchases_sql\")\r\n",
+					"\r\n",
+					"display(dfTopPurchasesFromSql.limit(10))"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"inner_join = dfsales.join(dfTopPurchasesFromSql,\r\n",
+					"    (dfsales.CustomerId == dfTopPurchasesFromSql.visitorId) & (dfsales.ProductId == dfTopPurchasesFromSql.productId))\r\n",
+					"\r\n",
+					"inner_join_agg = (inner_join.select(\"CustomerId\",\"TotalAmount\",\"Quantity\",\"itemsPurchasedLast12Months\",\"top_purchases_sql.productId\")\r\n",
+					"    .groupBy([\"CustomerId\",\"top_purchases_sql.productId\"])\r\n",
+					"    .agg(\r\n",
+					"        sum(\"TotalAmount\").alias(\"TotalAmountDecember\"),\r\n",
+					"        sum(\"Quantity\").alias(\"TotalQuantityDecember\"),\r\n",
+					"        sum(\"itemsPurchasedLast12Months\").alias(\"TotalItemsPurchasedLast12Months\"))\r\n",
+					"    .orderBy(\"CustomerId\") )\r\n",
+					"\r\n",
+					"display(inner_join_agg.limit(100))"
+				],
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
