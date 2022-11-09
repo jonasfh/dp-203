@@ -1,0 +1,21 @@
+{
+	"name": "asal400_december_sales",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "asadatalake783871",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "sale-20161230-snappy.parquet",
+				"folderPath": "campaign-analytics",
+				"fileSystem": "wwi-02"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
