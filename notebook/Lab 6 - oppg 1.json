@@ -1,0 +1,61 @@
+{
+	"name": "Lab 6 - oppg 1",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "d4a4bec5-7d14-4390-8ca1-ac3c2cd32a60"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Exercise 1 - Code-free transformation at scale with Azure Synapse Pipelines\r\n",
+					"Tailwind Traders would like code-free options for data engineering tasks. Their motivation is driven by the desire to allow junior-level data engineers who understand the data but do not have a lot of development experience build and maintain data transformation operations. The other driver for this requirement is to reduce fragility caused by complex code with reliance on libraries pinned to specific versions, remove code testing requirements, and improve ease of long-term maintenance.\r\n",
+					"\r\n",
+					"Their other requirement is to maintain transformed data in a data lake in addition to the dedicated SQL pool. This gives them the flexibility to retain more fields in their data sets than they otherwise store in fact and dimension tables, and doing this allows them to access the data when they have paused the dedicated SQL pool, as a cost optimization.\r\n",
+					"\r\n",
+					"Given these requirements, you recommend building Mapping Data Flows.\r\n",
+					"\r\n",
+					"Mapping Data flows are pipeline activities that provide a visual way of specifying how to transform data, through a code-free experience. This feature offers data cleansing, transformation, aggregation, conversion, joins, data copy operations, etc.\r\n",
+					"\r\n",
+					"Additional benefits\r\n",
+					"\r\n",
+					"- Cloud scale via Spark execution\r\n",
+					"- Guided experience to easily build resilient data flows\r\n",
+					"- Flexibility to transform data per user’s comfort\r\n",
+					"- Monitor and manage data flows from a single pane of glass"
+				]
+			}
+		]
+	}
+}
