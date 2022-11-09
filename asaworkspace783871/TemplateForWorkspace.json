@@ -292,8 +292,63 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/dataflows/asal400_lab2_writecampaignanalyticstoasa')]",
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('workspaceId'), '/dataflows/asal400_lab2_writecampaignanalyticstoasa')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Write User Profile Data to ASA')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "write_user_profile_to_asa",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "write_user_profile_to_asa",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"EcommerceUserProfiles": {},
+									"UserProfiles": {},
+									"UserTopProductPurchasesASA": {},
+									"DataLake": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "asadatalake783871",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "staging/userprofiles"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/write_user_profile_to_asa')]",
+				"[concat(variables('workspaceId'), '/linkedServices/asadatalake783871')]"
 			]
 		},
 		{
@@ -1076,6 +1131,185 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/write_user_profile_to_asa')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "asal400_ecommerce_userprofiles_source",
+								"type": "DatasetReference"
+							},
+							"name": "EcommerceUserProfiles"
+						},
+						{
+							"dataset": {
+								"referenceName": "asal400_customerprofile_cosmosdb",
+								"type": "DatasetReference"
+							},
+							"name": "UserProfiles"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "asal400_wwi_usertopproductpurchases_asa",
+								"type": "DatasetReference"
+							},
+							"name": "UserTopProductPurchasesASA"
+						},
+						{
+							"linkedService": {
+								"referenceName": "asaworkspace783871-WorkspaceDefaultStorage",
+								"type": "LinkedServiceReference"
+							},
+							"name": "DataLake"
+						}
+					],
+					"transformations": [
+						{
+							"name": "userId"
+						},
+						{
+							"name": "UserTopProducts"
+						},
+						{
+							"name": "DeriveProductColumns"
+						},
+						{
+							"name": "UserPreferredProducts"
+						},
+						{
+							"name": "JoinTopProductsWithPreferredProducts"
+						},
+						{
+							"name": "DerivedColumnsForMerge"
+						},
+						{
+							"name": "FilterEmptyProducts"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          visitorId as integer,",
+						"          topProductPurchases as (productId as integer, itemsPurchasedLast12Months as integer)[]",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'arrayOfDocuments',",
+						"     wildcardPaths:['online-user-profiles-02/*.json']) ~> EcommerceUserProfiles",
+						"source(output(",
+						"          userId as integer,",
+						"          cartId as string,",
+						"          preferredProducts as integer[],",
+						"          productReviews as (productId as integer, reviewDate as string, reviewText as string)[]",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'document') ~> UserProfiles",
+						"EcommerceUserProfiles derive(visitorId = toInteger(visitorId)) ~> userId",
+						"userId foldDown(unroll(topProductPurchases),",
+						"     mapColumn(",
+						"          visitorId,",
+						"          productId = topProductPurchases.productId,",
+						"          itemsPurchasedLast12Months = topProductPurchases.itemsPurchasedLast12Months",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> UserTopProducts",
+						"UserTopProducts derive(productId = toInteger(productId),",
+						"          itemsPurchasedLast12Months = toInteger(itemsPurchasedLast12Months)) ~> DeriveProductColumns",
+						"UserProfiles foldDown(unroll(preferredProducts),",
+						"     mapColumn(",
+						"          userId,",
+						"          preferredProductId = preferredProducts",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> UserPreferredProducts",
+						"DeriveProductColumns, UserPreferredProducts join(visitorId == userId,",
+						"     joinType:'outer',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     partitionBy('hash', 30,",
+						"          productId",
+						"     ),",
+						"     broadcast: 'left')~> JoinTopProductsWithPreferredProducts",
+						"JoinTopProductsWithPreferredProducts derive(isTopProduct = toBoolean(iif(isNull(productId), 'false', 'true')),",
+						"          isPreferredProduct = toBoolean(iif(isNull(preferredProductId), 'false', 'true')),",
+						"          productId = iif(isNull(productId), preferredProductId, productId),",
+						"          userId = iif(isNull(userId), visitorId, userId)) ~> DerivedColumnsForMerge",
+						"DerivedColumnsForMerge filter(!isNull(productId)) ~> FilterEmptyProducts",
+						"FilterEmptyProducts sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          UserId as integer,",
+						"          ProductId as integer,",
+						"          ItemsPurchasedLast12Months as integer,",
+						"          IsTopProduct as boolean,",
+						"          IsPreferredProduct as boolean",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     truncate:true,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     allowCopyCommand: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          UserId = userId,",
+						"          ProductId = productId,",
+						"          ItemsPurchasedLast12Months = itemsPurchasedLast12Months,",
+						"          IsTopProduct = isTopProduct,",
+						"          IsPreferredProduct = isPreferredProduct",
+						"     )) ~> UserTopProductPurchasesASA",
+						"FilterEmptyProducts sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'delta',",
+						"     compressionType: 'snappy',",
+						"     compressionLevel: 'Fastest',",
+						"     fileSystem: 'wwi-02',",
+						"     folderPath: 'top-products',",
+						"     truncate:true,",
+						"     mergeSchema: false,",
+						"     autoCompact: false,",
+						"     optimizedWrite: false,",
+						"     vacuum: 0,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     mapColumn(",
+						"          visitorId,",
+						"          productId,",
+						"          itemsPurchasedLast12Months,",
+						"          userId,",
+						"          preferredProductId,",
+						"          isTopProduct,",
+						"          isPreferredProduct",
+						"     )) ~> DataLake"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/asal400_ecommerce_userprofiles_source')]",
+				"[concat(variables('workspaceId'), '/datasets/asal400_customerprofile_cosmosdb')]",
+				"[concat(variables('workspaceId'), '/datasets/asal400_wwi_usertopproductpurchases_asa')]",
+				"[concat(variables('workspaceId'), '/linkedServices/asaworkspace783871-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
 			"type": "Microsoft.Synapse/workspaces/credentials",
 			"apiVersion": "2019-06-01-preview",
@@ -1217,6 +1451,26 @@
 						"name": "SQLPool01",
 						"type": "SqlPool"
 					}
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Test lab 6 oppg 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT ProductCategory\n,SUM(Revenue) AS TotalRevenue\n,SUM(RevenueTarget) AS TotalRevenueTarget\n,(SUM(RevenueTarget) - SUM(Revenue)) AS Delta\nFROM [wwi].[CampaignAnalytics]\nGROUP BY ProductCategory",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "SQLPool01",
+						"poolName": "SQLPool01"
+					},
+					"resultLimit": 5000
 				},
 				"type": "SqlQuery"
 			},
@@ -1770,6 +2024,51 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Lab 6 - oppg 3')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "3e8ea3bc-d88a-4bc4-b1ff-2ff0c5e66354"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -2261,6 +2560,69 @@
 						],
 						"outputs": [],
 						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/lab 6 oppg 2')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "29967688-aa87-40e7-88a1-822486db268c"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Exercise 2 - Create Mapping Data Flow for top product purchases\r\n",
+							"Tailwind Traders needs to combine top product purchases imported as JSON files from their eCommerce system with user preferred products from profile data stored as JSON documents in Azure Cosmos DB. They want to store the combined data in a dedicated SQL pool as well as their data lake for further analysis and reporting.\r\n",
+							"\r\n",
+							"To do this, you will build a mapping data flow that performs the following tasks:\r\n",
+							"\r\n",
+							"- Adds two ADLS Gen2 data sources for the JSON data\r\n",
+							"- Flattens the hierarchical structure of both sets of files\r\n",
+							"- Performs data transformations and type conversions\r\n",
+							"- Joins both data sources\r\n",
+							"- Creates new fields on the joined data set based on conditional logic\r\n",
+							"- Filters null records for required fields\r\n",
+							"- Writes to the dedicated SQL pool\r\n",
+							"- Simultaneously writes to the data lake\r\n",
+							""
+						]
 					}
 				]
 			},
