@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3fef5ff1-6e35-4e1e-88e6-33b9728194df"
+				"spark.autotune.trackingId": "29967688-aa87-40e7-88a1-822486db268c"
 			}
 		},
 		"metadata": {
@@ -40,7 +40,19 @@
 				},
 				"source": [
 					"# Exercise 2 - Create Mapping Data Flow for top product purchases\r\n",
-					"Tailwind Traders needs to combine top product purchases imported as JSON files from their eCommerce system with user preferred products from profile data stored as JSON documents in Azure Cosmos DB. They want to store the combined data in a dedicated SQL pool as well as their data lake for further analysis and reporting."
+					"Tailwind Traders needs to combine top product purchases imported as JSON files from their eCommerce system with user preferred products from profile data stored as JSON documents in Azure Cosmos DB. They want to store the combined data in a dedicated SQL pool as well as their data lake for further analysis and reporting.\r\n",
+					"\r\n",
+					"To do this, you will build a mapping data flow that performs the following tasks:\r\n",
+					"\r\n",
+					"- Adds two ADLS Gen2 data sources for the JSON data\r\n",
+					"- Flattens the hierarchical structure of both sets of files\r\n",
+					"- Performs data transformations and type conversions\r\n",
+					"- Joins both data sources\r\n",
+					"- Creates new fields on the joined data set based on conditional logic\r\n",
+					"- Filters null records for required fields\r\n",
+					"- Writes to the dedicated SQL pool\r\n",
+					"- Simultaneously writes to the data lake\r\n",
+					""
 				]
 			}
 		]
