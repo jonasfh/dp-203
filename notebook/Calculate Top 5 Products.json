@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fe85342f-ebf8-4e10-8cfb-1349bb3ffbb1"
+				"spark.autotune.trackingId": "41affaa0-c70c-468f-afa8-bab01bcea7e0"
 			}
 		},
 		"metadata": {
@@ -228,7 +228,8 @@
 					"import uuid\r\n",
 					"\r\n",
 					"# Generate random GUID\r\n",
-					"runId = uuid.uuid4()"
+					"runId = uuid.uuid4()\r\n",
+					""
 				],
 				"execution_count": 8
 			},
