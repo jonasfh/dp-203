@@ -13,7 +13,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6a981612-e95b-4b82-8700-c5c2cd570e2d"
+				"spark.autotune.trackingId": "2b1c63a2-0c96-40b7-9ceb-eb2b7733da2b"
 			}
 		},
 		"metadata": {
@@ -45,6 +45,20 @@
 					"After completing this lab, you will be able to:\r\n",
 					"\r\n",
 					"* Orchestrate data movement and transformation in Azure Synapse Pipelines"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Exercise 1 - Create mapping data flow and pipeline\r\n",
+					"In this exercise, you create a mapping data flow that copies user profile data to the data lake, then create a pipeline that orchestrates executing the data flow, and later on, the Spark notebook you create later in this lab."
 				]
 			}
 		]
