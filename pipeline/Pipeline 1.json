@@ -38,13 +38,16 @@
 						]
 					}
 				],
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "SecretValue",
+					"value": "@activity('Web1').output.value"
+				}
 			}
 		],
 		"variables": {
-			"SecretValue ": {
-				"type": "String",
-				"defaultValue": "@activity('Web1').output.value"
+			"SecretValue": {
+				"type": "String"
 			}
 		},
 		"annotations": []
