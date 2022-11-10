@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "abffdb0e-19af-4298-9e08-2774273cd37c"
+				"spark.autotune.trackingId": "b68befc0-3be0-455e-a4ca-559ea8c9595f"
 			}
 		},
 		"metadata": {
@@ -230,6 +230,7 @@
 					"# Generate random GUID\r\n",
 					"runId = uuid.uuid4()\r\n",
 					"\r\n",
+					"# runId will be overridden by parameters, as this is a parameter-cell?!\r\n",
 					"top5ProductsOverall.write.parquet('abfss://wwi-02@asadatalake783871.dfs.core.windows.net/top5-products/' + str(runId) + '.parquet')"
 				],
 				"execution_count": 1
