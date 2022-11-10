@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2c2935f6-7334-4226-978d-cbd8d719235f"
+				"spark.autotune.trackingId": "b0fb5cea-7f1c-41e5-acb8-05d41b152b1b"
 			}
 		},
 		"metadata": {
@@ -252,9 +252,10 @@
 					}
 				},
 				"source": [
-					"# ...however, runId IS overridden by parameters in this cell! So local \r\n",
+					"# ...however, runId IS overridden by parameters in this cell! So parameter variables are overridden in new cells, \r\n",
 					"top5ProductsOverall.write.parquet('abfss://wwi-02@asadatalake783871.dfs.core.windows.net/top5-products/' + str(runId) + '.parquet')\r\n",
 					"\r\n",
+					"# ... while other variables are kept as they are\r\n",
 					"top5ProductsOverall.write.parquet('abfss://wwi-02@asadatalake783871.dfs.core.windows.net/top5-products/' + (anyvar if anyvar else \"fantestikke\") + '.parquet')\r\n",
 					""
 				],
