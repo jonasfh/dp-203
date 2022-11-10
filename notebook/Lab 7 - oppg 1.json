@@ -1,0 +1,52 @@
+{
+	"name": "Lab 7 - oppg 1",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "6a981612-e95b-4b82-8700-c5c2cd570e2d"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Lab 7 - Integrate data from notebooks with Azure Data Factory or Azure Synapse Pipelines\r\n",
+					"You will learn how to create linked services, and orchestrate data movement and transformation in Azure Synapse Pipelines.\r\n",
+					"\r\n",
+					"After completing this lab, you will be able to:\r\n",
+					"\r\n",
+					"* Orchestrate data movement and transformation in Azure Synapse Pipelines"
+				]
+			}
+		]
+	}
+}
