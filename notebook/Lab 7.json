@@ -1,0 +1,85 @@
+{
+	"name": "Lab 7",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "68633f87-6167-4567-a44b-69cf13ccf1fa"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Lab 7 - Integrate data from notebooks with Azure Data Factory or Azure Synapse Pipelines\r\n",
+					"\r\n",
+					"You will learn how to create linked services, and orchestrate data movement and transformation in Azure Synapse Pipelines.\r\n",
+					"\r\n",
+					"After completing this lab, you will be able to:\r\n",
+					"\r\n",
+					"* Orchestrate data movement and transformation in Azure Synapse Pipelines"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Exercise 1 - Create mapping data flow and pipeline\r\n",
+					"\r\n",
+					"In this exercise, you create a mapping data flow that copies user profile data to the data lake, then create a pipeline that orchestrates executing the data flow, and later on, the Spark notebook you create later in this lab."
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Exercise 2 - Create Synapse Spark notebook to find top products\r\n",
+					"\r\n",
+					"Tailwind Traders uses a Mapping Data flow in Synapse Analytics to process, join, and import user profile data. Now they want to find the top 5 products for each user, based on which ones are both preferred and top, and have the most purchases in the past 12 months. Then, they want to calculate the top 5 products overall.\r\n",
+					"\r\n",
+					"In this exercise, you will create a Synapse Spark notebook to make these calculations."
+				]
+			}
+		]
+	}
+}
