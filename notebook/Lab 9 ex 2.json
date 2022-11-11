@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9e7fff29-0808-473c-a1ac-1c01dd5b4556"
+				"spark.autotune.trackingId": "a12a37cb-f212-4d5b-8119-d458fdd7d6b1"
 			}
 		},
 		"metadata": {
@@ -48,6 +48,22 @@
 			"sessionKeepAliveTimeout": 30
 		},
 		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Lab 9 exercise 1\r\n",
+					"\r\n",
+					"Ikke gjort denne\r\n",
+					""
+				]
+			},
 			{
 				"cell_type": "code",
 				"source": [
