@@ -2,12 +2,12 @@
 	"name": "User Profile HTAP",
 	"properties": {
 		"content": {
-			"query": "USE master\nGO\n\nIF DB_ID (N'Profiles') IS NULL\nBEGIN\n    CREATE DATABASE Profiles;\nEND\nGO\n\nUSE Profiles\nGO\n\nDROP VIEW IF EXISTS OnlineUserProfile01;\nGO\n\nCREATE VIEW OnlineUserProfile01\nAS\nSELECT\n    *\nFROM OPENROWSET(\n    'CosmosDB',\n    N'account=asacosmosdb783871;database=CustomerProfile;key=UQNP7J4fDur04uMUPNhOgtpNDZOb1YAlxYOgG0OmvEutI4vtSgSeqlUQSHFhrEINijmJPo18n7wLACDbVETsKQ==',\n    OnlineUserProfile01\n)\nWITH (\n    userId bigint,\n    cartId varchar(50),\n    preferredProducts varchar(max),\n    productReviews varchar(max)\n) AS profiles\nCROSS APPLY OPENJSON (productReviews)\nWITH (\n    productId bigint,\n    reviewText varchar(1000)\n) AS reviews\nGO",
+			"query": "USE master\nGO\n\nIF DB_ID (N'Profiles') IS NULL\nBEGIN\n    CREATE DATABASE Profiles;\nEND\nGO\n\nUSE Profiles\nGO\n\nDROP VIEW IF EXISTS OnlineUserProfile01;\nGO\n\nCREATE VIEW OnlineUserProfile01\nAS\nSELECT\n    *\nFROM OPENROWSET(\n    'CosmosDB',\n    N'account=asacosmosdb783871;database=CustomerProfile;key=UQNP7J4fDur04uMUPNhOgtpNDZOb1YAlxYOgG0OmvEutI4vtSgSeqlUQSHFhrEINijmJPo18n7wLACDbVETsKQ==',\n    OnlineUserProfile01\n)\nWITH (\n    userId bigint,\n    cartId varchar(50),\n    preferredProducts varchar(max),\n    productReviews varchar(max)\n) AS profiles\nCROSS APPLY OPENJSON (productReviews)\nWITH (\n    productId bigint,\n    reviewText varchar(1000)\n) AS reviews\nGO\n",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "Profiles",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
